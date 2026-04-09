@@ -43,12 +43,14 @@ flate2 = "1.0"
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52"
 
-# Egui GUI framework
-eframe = { version = "0.32", default-features = false, features = ["default_fonts", "glow"] }
-egui = "0.32"
+# Iced GUI framework with Fluent theme
+iced = { version = "0.13", features = ["tokio", "advanced"] }
 
 # File dialog for folder selection
 rfd = "0.17"
+
+# Icons for iced
+iced_aw = { version = "0.10", features = ["icons"] }
 
 [dev-dependencies]
 tempfile = "3.0"
