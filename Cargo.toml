@@ -1,0 +1,63 @@
+[package]
+name = "env-switcher"
+version = "0.1.0"
+edition = "2021"
+description = "A lightweight multi-version environment manager for Node.js and Java"
+authors = ["Your Name <your.email@example.com>"]
+
+[dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+futures = "0.3"
+
+# HTTP client for downloading versions
+reqwest = { version = "0.11", features = ["json", "stream"] }
+
+# File system utilities
+tokio-util = { version = "0.7", features = ["io"] }
+
+# Path handling
+pathdiff = "0.2"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Directory paths (cross-platform)
+dirs = "5.0"
+
+# Archive handling (for downloading Node.js/JDK)
+zip = "0.6"
+tar = "0.4"
+flate2 = "1.0"
+
+# Windows registry
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52"
+
+# Egui GUI framework
+eframe = { version = "0.32", default-features = false, features = ["default_fonts", "glow"] }
+egui = "0.32"
+
+# File dialog for folder selection
+rfd = "0.17"
+
+[dev-dependencies]
+tempfile = "3.0"
+
+# Single GUI binary
+[[bin]]
+name = "env-switcher"
+path = "src/main.rs"
+
+[lib]
+name = "env_switcher"
+path = "src/lib.rs"
