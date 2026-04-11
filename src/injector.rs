@@ -196,13 +196,13 @@ function global:Set-Location {{
         [string]$StackName
     )
 
-    # Execute the actual cd command
-    if ($Path) {{
-        & $wrappedCmd -Path $Path -PassThru:$PassThru -StackName $StackName
-    }}
-    else {{
-        & $wrappedCmd -PassThru:$PassThru -StackName $StackName
-    }}
+    # Execute the actual cd command with proper parameter set handling
+    $splat = @{{}}
+    if ($Path) {{ $splat['Path'] = $Path }}
+    if ($PassThru) {{ $splat['PassThru'] = $PassThru }}
+    if ($StackName) {{ $splat['StackName'] = $StackName }}
+
+    & $wrappedCmd @splat
 
     # Switch environment based on new location
     if ($PWD) {{
@@ -219,12 +219,13 @@ function global:Push-Location {{
         [string]$StackName
     )
 
-    if ($Path) {{
-        & $wrappedPush -Path $Path -PassThru:$PassThru -StackName $StackName
-    }}
-    else {{
-        & $wrappedPush -PassThru:$PassThru -StackName $StackName
-    }}
+    # Execute with proper parameter set handling
+    $splat = @{{}}
+    if ($Path) {{ $splat['Path'] = $Path }}
+    if ($PassThru) {{ $splat['PassThru'] = $PassThru }}
+    if ($StackName) {{ $splat['StackName'] = $StackName }}
+
+    & $wrappedPush @splat
 
     if ($PWD) {{
         Switch-Environment -targetPath $PWD.Path
