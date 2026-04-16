@@ -5,13 +5,10 @@
 use anyhow::Result;
 use env_switcher::{Config, HookInjector, PathMatcher};
 use iced::widget::{
-    button, column, container, horizontal_space, row, scrollable,
-    text, text_input, Column, Row, Space, Text,
+    button, column, container, horizontal_space, row, scrollable, text, text_input, Column, Row,
+    Space, Text,
 };
-use iced::{
-    Border, Color, Element, Fill, Length, Theme, Task, window,
-    Alignment,
-};
+use iced::{window, Alignment, Border, Color, Element, Fill, Length, Task, Theme};
 use iced_aw::{bootstrap::Bootstrap, BOOTSTRAP_FONT};
 use std::path::PathBuf;
 
@@ -162,17 +159,26 @@ impl EnvSwitcherApp {
         let config = Config::load().unwrap_or_default();
         let config_path = Config::default_config_path();
 
-        let node_versions: Vec<VersionEntry> = config.node_versions
+        let node_versions: Vec<VersionEntry> = config
+            .node_versions
             .iter()
-            .map(|(v, c)| VersionEntry { version: v.clone(), path: c.path.clone() })
+            .map(|(v, c)| VersionEntry {
+                version: v.clone(),
+                path: c.path.clone(),
+            })
             .collect();
 
-        let java_versions: Vec<VersionEntry> = config.java_versions
+        let java_versions: Vec<VersionEntry> = config
+            .java_versions
             .iter()
-            .map(|(v, c)| VersionEntry { version: v.clone(), path: c.path.clone() })
+            .map(|(v, c)| VersionEntry {
+                version: v.clone(),
+                path: c.path.clone(),
+            })
             .collect();
 
-        let path_mappings: Vec<PathMappingEntry> = config.path_mappings
+        let path_mappings: Vec<PathMappingEntry> = config
+            .path_mappings
             .iter()
             .map(|m| PathMappingEntry {
                 path: m.path.clone(),
@@ -224,7 +230,10 @@ impl EnvSwitcherApp {
     }
 
     fn set_status(&mut self, text: impl Into<String>, level: StatusLevel) {
-        self.status_message = Some(StatusMessage { text: text.into(), level });
+        self.status_message = Some(StatusMessage {
+            text: text.into(),
+            level,
+        });
     }
 
     fn save_config(&mut self) -> Result<()> {
@@ -236,16 +245,31 @@ impl EnvSwitcherApp {
         match Config::load() {
             Ok(config) => {
                 self.config = config.clone();
-                self.node_versions = config.node_versions.iter()
-                    .map(|(v, c)| VersionEntry { version: v.clone(), path: c.path.clone() }).collect();
-                self.java_versions = config.java_versions.iter()
-                    .map(|(v, c)| VersionEntry { version: v.clone(), path: c.path.clone() }).collect();
-                self.path_mappings = config.path_mappings.iter()
+                self.node_versions = config
+                    .node_versions
+                    .iter()
+                    .map(|(v, c)| VersionEntry {
+                        version: v.clone(),
+                        path: c.path.clone(),
+                    })
+                    .collect();
+                self.java_versions = config
+                    .java_versions
+                    .iter()
+                    .map(|(v, c)| VersionEntry {
+                        version: v.clone(),
+                        path: c.path.clone(),
+                    })
+                    .collect();
+                self.path_mappings = config
+                    .path_mappings
+                    .iter()
                     .map(|m| PathMappingEntry {
                         path: m.path.clone(),
                         node_version: m.node_version.clone().unwrap_or_default(),
                         java_version: m.java_version.clone().unwrap_or_default(),
-                    }).collect();
+                    })
+                    .collect();
                 self.set_status("配置已刷新", StatusLevel::Success);
             }
             Err(e) => self.set_status(format!("加载配置失败：{}", e), StatusLevel::Error),
@@ -284,7 +308,8 @@ impl EnvSwitcherApp {
             return;
         }
         let version = self.new_node_version.clone();
-        self.config.add_node_version(version.clone(), self.new_node_path.clone());
+        self.config
+            .add_node_version(version.clone(), self.new_node_path.clone());
         if let Err(e) = self.save_config() {
             self.set_status(format!("保存配置失败：{}", e), StatusLevel::Error);
         } else {
@@ -315,7 +340,8 @@ impl EnvSwitcherApp {
             return;
         }
         let version = self.new_java_version.clone();
-        self.config.add_java_version(version.clone(), self.new_java_path.clone());
+        self.config
+            .add_java_version(version.clone(), self.new_java_path.clone());
         if let Err(e) = self.save_config() {
             self.set_status(format!("保存配置失败：{}", e), StatusLevel::Error);
         } else {
@@ -345,10 +371,19 @@ impl EnvSwitcherApp {
             self.set_status("项目路径不能为空", StatusLevel::Warning);
             return;
         }
-        let node_ver = if self.selected_node_for_mapping.is_empty() { None } else { Some(self.selected_node_for_mapping.clone()) };
-        let java_ver = if self.selected_java_for_mapping.is_empty() { None } else { Some(self.selected_java_for_mapping.clone()) };
+        let node_ver = if self.selected_node_for_mapping.is_empty() {
+            None
+        } else {
+            Some(self.selected_node_for_mapping.clone())
+        };
+        let java_ver = if self.selected_java_for_mapping.is_empty() {
+            None
+        } else {
+            Some(self.selected_java_for_mapping.clone())
+        };
 
-        self.config.add_path_mapping(self.new_mapping_path.clone(), node_ver, java_ver);
+        self.config
+            .add_path_mapping(self.new_mapping_path.clone(), node_ver, java_ver);
         if let Err(e) = self.save_config() {
             self.set_status(format!("保存配置失败：{}", e), StatusLevel::Error);
         } else {
@@ -361,7 +396,10 @@ impl EnvSwitcherApp {
             self.selected_node_for_mapping.clear();
             self.selected_java_for_mapping.clear();
             self.show_add_mapping_dialog = false;
-            self.set_status(format!("已添加路径映射：{}", self.new_mapping_path.clone()), StatusLevel::Success);
+            self.set_status(
+                format!("已添加路径映射：{}", self.new_mapping_path.clone()),
+                StatusLevel::Success,
+            );
         }
     }
 
@@ -378,7 +416,11 @@ impl EnvSwitcherApp {
     fn open_config_folder(&mut self) {
         let path = Config::default_config_path();
         if path.exists() {
-            std::process::Command::new("explorer").arg("/select,").arg(&path).spawn().ok();
+            std::process::Command::new("explorer")
+                .arg("/select,")
+                .arg(&path)
+                .spawn()
+                .ok();
             self.set_status("已打开配置文件夹", StatusLevel::Success);
         } else {
             self.set_status("配置文件不存在", StatusLevel::Warning);
@@ -386,7 +428,10 @@ impl EnvSwitcherApp {
     }
 
     fn browse_for_folder(&self, title: &str) -> Option<String> {
-        rfd::FileDialog::new().set_title(title).pick_folder().map(|p| p.to_string_lossy().to_string())
+        rfd::FileDialog::new()
+            .set_title(title)
+            .pick_folder()
+            .map(|p| p.to_string_lossy().to_string())
     }
 
     fn update(&mut self, message: Message) -> Task<Message> {
@@ -422,7 +467,9 @@ impl EnvSwitcherApp {
                     self.new_java_path = path;
                 }
             }
-            Message::JavaVersionInputForMappingChanged(value) => self.selected_java_for_mapping = value,
+            Message::JavaVersionInputForMappingChanged(value) => {
+                self.selected_java_for_mapping = value
+            }
             Message::AddJavaVersion => self.add_java_version(),
             Message::RemoveJavaVersion(version) => self.remove_java_version(&version),
             Message::OpenAddMappingDialog => self.show_add_mapping_dialog = true,
@@ -438,7 +485,9 @@ impl EnvSwitcherApp {
                     self.new_mapping_path = path;
                 }
             }
-            Message::NodeVersionInputForMappingChanged(value) => self.selected_node_for_mapping = value,
+            Message::NodeVersionInputForMappingChanged(value) => {
+                self.selected_node_for_mapping = value
+            }
             Message::AddPathMapping => self.add_path_mapping(),
             Message::RemovePathMapping(path) => self.remove_path_mapping(&path),
             Message::RefreshConfig => self.refresh_config(),
@@ -448,13 +497,23 @@ impl EnvSwitcherApp {
     }
 
     fn view(&self) -> Element<Message> {
-        row![self.sidebar(), self.content()].spacing(0).height(Fill).into()
+        row![self.sidebar(), self.content()]
+            .spacing(0)
+            .height(Fill)
+            .into()
     }
 
     fn sidebar(&self) -> Element<Message> {
-        let logo = Text::new(Bootstrap::Plug.to_string()).font(BOOTSTRAP_FONT).size(24).color(FluentColors::TEXT_PRIMARY);
-        let title = text("Env Switcher").size(16).color(FluentColors::TEXT_PRIMARY);
-        let subtitle = text("多版本环境管理工具").size(10).color(FluentColors::TEXT_SECONDARY);
+        let logo = Text::new(Bootstrap::Plug.to_string())
+            .font(BOOTSTRAP_FONT)
+            .size(24)
+            .color(FluentColors::TEXT_PRIMARY);
+        let title = text("Env Switcher")
+            .size(16)
+            .color(FluentColors::TEXT_PRIMARY);
+        let subtitle = text("多版本环境管理工具")
+            .size(10)
+            .color(FluentColors::TEXT_SECONDARY);
 
         let header_col = column![logo, title, subtitle]
             .spacing(4)
@@ -462,18 +521,19 @@ impl EnvSwitcherApp {
             .width(Fill)
             .padding(20);
 
-        let header_card = container(header_col)
-            .width(Fill)
-            .padding(16)
-            .style(|_| container::Style {
-                background: Some(FluentColors::BG_CARD.into()),
-                border: Border {
-                    color: FluentColors::BORDER_SUBTLE,
-                    width: 1.0,
+        let header_card =
+            container(header_col)
+                .width(Fill)
+                .padding(16)
+                .style(|_| container::Style {
+                    background: Some(FluentColors::BG_CARD.into()),
+                    border: Border {
+                        color: FluentColors::BORDER_SUBTLE,
+                        width: 1.0,
+                        ..Default::default()
+                    },
                     ..Default::default()
-                },
-                ..Default::default()
-            });
+                });
 
         let mut nav_buttons: Vec<Element<Message>> = Vec::new();
         for tab in Tab::all() {
@@ -483,69 +543,160 @@ impl EnvSwitcherApp {
                 Tab::Node => Bootstrap::Cpu.to_string(),
                 Tab::Java => Bootstrap::Cup.to_string(),
                 Tab::Paths => Bootstrap::Folder.to_string(),
-            }).font(BOOTSTRAP_FONT).size(16);
+            })
+            .font(BOOTSTRAP_FONT)
+            .size(16);
             let btn_content = row![
                 icon.color(FluentColors::TEXT_PRIMARY),
                 Space::with_width(10),
                 text(tab.label()).size(14)
-            ].align_y(Alignment::Center);
+            ]
+            .align_y(Alignment::Center);
 
             let btn = button(btn_content)
                 .padding([12, 16])
                 .width(Fill)
-                .style(move |_theme: &Theme, status: button::Status| {
-                    button::Style {
-                        background: Some(if is_active || matches!(status, button::Status::Hovered) {
-                            FluentColors::BG_CARD
-                        } else {
-                            Color::TRANSPARENT
-                        }.into()),
+                .style(
+                    move |_theme: &Theme, status: button::Status| button::Style {
+                        background: Some(
+                            if is_active || matches!(status, button::Status::Hovered) {
+                                FluentColors::BG_CARD
+                            } else {
+                                Color::TRANSPARENT
+                            }
+                            .into(),
+                        ),
                         border: Border {
-                            color: if is_active { FluentColors::SUCCESS } else { Color::TRANSPARENT },
+                            color: if is_active {
+                                FluentColors::SUCCESS
+                            } else {
+                                Color::TRANSPARENT
+                            },
                             width: if is_active { 2.0 } else { 0.0 },
                             radius: 8.0.into(),
                             ..Default::default()
                         },
                         text_color: FluentColors::TEXT_PRIMARY,
                         ..Default::default()
-                    }
-                })
+                    },
+                )
                 .on_press(Message::TabSelected(*tab));
 
             nav_buttons.push(container(btn).width(Fill).padding([8, 12]).into());
         }
 
-        let nav_col = Column::with_children(nav_buttons).spacing(4).padding([0, 16]);
+        let nav_col = Column::with_children(nav_buttons)
+            .spacing(4)
+            .padding([0, 16]);
 
         let refresh_btn = button(
-            row![Text::new(Bootstrap::ArrowClockwise.to_string()).font(BOOTSTRAP_FONT).size(14).color(FluentColors::INFO), text("刷新").size(12)].spacing(8).align_y(Alignment::Center)
+            row![
+                Text::new(Bootstrap::ArrowClockwise.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(14)
+                    .color(FluentColors::INFO),
+                text("刷新").size(12)
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
         )
         .padding([8, 12])
-        .style(|_theme: &Theme, _status: button::Status| {
-            button::Style {
-                background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::INFO, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                text_color: FluentColors::TEXT_PRIMARY,
+        .style(|_theme: &Theme, _status: button::Status| button::Style {
+            background: Some(FluentColors::BG_CARD.into()),
+            border: Border {
+                color: FluentColors::INFO,
+                width: 1.0,
+                radius: 6.0.into(),
                 ..Default::default()
-            }
+            },
+            text_color: FluentColors::TEXT_PRIMARY,
+            ..Default::default()
         })
         .on_press(Message::RefreshConfig);
 
         let config_btn = button(
-            row![Text::new(Bootstrap::Folder.to_string()).font(BOOTSTRAP_FONT).size(14).color(FluentColors::WARNING), text("配置").size(12)].spacing(8).align_y(Alignment::Center)
+            row![
+                Text::new(Bootstrap::Folder.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(14)
+                    .color(FluentColors::WARNING),
+                text("配置").size(12)
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
         )
         .padding([8, 12])
-        .style(|_theme: &Theme, _status: button::Status| {
-            button::Style {
-                background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::WARNING, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                text_color: FluentColors::TEXT_PRIMARY,
+        .style(|_theme: &Theme, _status: button::Status| button::Style {
+            background: Some(FluentColors::BG_CARD.into()),
+            border: Border {
+                color: FluentColors::WARNING,
+                width: 1.0,
+                radius: 6.0.into(),
                 ..Default::default()
-            }
+            },
+            text_color: FluentColors::TEXT_PRIMARY,
+            ..Default::default()
         })
         .on_press(Message::OpenConfigFolder);
 
-        let bottom_btns = column![refresh_btn, config_btn].spacing(8).padding(16);
+        let install_btn = button(
+            row![
+                Text::new(Bootstrap::Folder.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(14)
+                    .color(FluentColors::WARNING),
+                text("重装").size(12)
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
+        )
+        .padding([8, 12])
+        .style(|_theme: &Theme, _status: button::Status| button::Style {
+            background: Some(FluentColors::BG_CARD.into()),
+            border: Border {
+                color: FluentColors::SUCCESS,
+                width: 1.0,
+                radius: 6.0.into(),
+                ..Default::default()
+            },
+            text_color: FluentColors::TEXT_PRIMARY,
+            ..Default::default()
+        })
+        .on_press(Message::InstallHook);
+
+        let uninstall_btn = button(
+            row![
+                Text::new(Bootstrap::Folder.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(14)
+                    .color(FluentColors::WARNING),
+                text("卸载").size(12)
+            ]
+            .spacing(8)
+            .align_y(Alignment::Center),
+        )
+        .padding([8, 12])
+        .style(|_theme: &Theme, _status: button::Status| button::Style {
+            background: Some(FluentColors::BG_CARD.into()),
+            border: Border {
+                color: FluentColors::ERROR,
+                width: 1.0,
+                radius: 6.0.into(),
+                ..Default::default()
+            },
+            text_color: FluentColors::TEXT_PRIMARY,
+            ..Default::default()
+        })
+        .on_press(Message::UninstallHook);
+
+        let r1 = row![install_btn, uninstall_btn]
+            .spacing(8)
+            .align_y(Alignment::Center);
+        let r2 = row![refresh_btn, config_btn]
+            .spacing(8)
+            .align_y(Alignment::Center);
+
+        let bottom_btns = column![r1, r2].spacing(8).padding(16);
 
         let sidebar_col = column![
             header_card,
@@ -553,14 +704,19 @@ impl EnvSwitcherApp {
             nav_col,
             container(Space::with_height(Fill)).height(Fill),
             bottom_btns
-        ].spacing(0);
+        ]
+        .spacing(0);
 
         container(sidebar_col)
             .width(Length::Fixed(220.0))
             .height(Fill)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_BASE.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    ..Default::default()
+                },
                 ..Default::default()
             })
             .into()
@@ -591,14 +747,20 @@ impl EnvSwitcherApp {
             .width(Fill)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_SUBTLE, width: 1.0, ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_SUBTLE,
+                    width: 1.0,
+                    ..Default::default()
+                },
                 ..Default::default()
             });
 
         column![
             container(content).padding(24).height(Fill).width(Fill),
             status_bar
-        ].spacing(0).into()
+        ]
+        .spacing(0)
+        .into()
     }
 
     fn overview_view(&self) -> Element<Message> {
@@ -616,117 +778,179 @@ impl EnvSwitcherApp {
         } else {
             ("○", FluentColors::TEXT_MUTED, "未安装")
         };
-
-        let status_row = row![text(status_icon).color(status_color).size(16), text(status_text_val).size(14)].spacing(8);
-
-        let reinstall_btn = button(text("重装").size(12))
-            .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
-                    ..Default::default()
-                }
-            })
-            .on_press(Message::InstallHook);
-
-        let mut action_row_content: Vec<Element<Message>> = vec![reinstall_btn.into()];
-        if self.hook_installed {
-            let uninstall_btn = button(text("卸载").size(12))
-                .padding([6, 12])
-                .style(|_theme: &Theme, _status: button::Status| {
-                    button::Style {
-                        background: Some(Color::TRANSPARENT.into()),
-                        border: Border { color: FluentColors::ERROR, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                        text_color: FluentColors::TEXT_PRIMARY,
-                        ..Default::default()
-                    }
-                })
-                .on_press(Message::UninstallHook);
-            action_row_content.push(uninstall_btn.into());
-        }
-
-        let action_row = Row::with_children(action_row_content).spacing(8);
+        let status_row = row![
+            text(status_icon).color(status_color).size(16),
+            text(status_text_val).size(14)
+        ]
+        .spacing(8);
 
         let card_content: Element<Message> = column![
-            row![Text::new(Bootstrap::Plug.to_string()).font(BOOTSTRAP_FONT).size(20).color(FluentColors::TEXT_PRIMARY), text("Hook 状态").size(14).color(FluentColors::TEXT_PRIMARY)].spacing(8),
+            row![
+                Text::new(Bootstrap::Plug.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(20)
+                    .color(FluentColors::TEXT_PRIMARY),
+                text("Hook 状态").size(14).color(FluentColors::TEXT_PRIMARY)
+            ]
+            .spacing(8),
             Space::with_height(12),
             status_row,
             Space::with_height(16),
-            action_row
-        ].spacing(8).into();
+            // action_row
+        ]
+        .spacing(8)
+        .into();
 
         self.card(card_content, 200.0, 140.0)
     }
 
     fn node_summary_card(&self) -> Element<Message> {
         let node_count = self.node_versions.len();
-        let project_count = self.path_mappings.iter().filter(|m| !m.node_version.is_empty()).count();
+        let project_count = self
+            .path_mappings
+            .iter()
+            .filter(|m| !m.node_version.is_empty())
+            .count();
 
         let card_content: Element<Message> = column![
-            row![Text::new(Bootstrap::Cpu.to_string()).font(BOOTSTRAP_FONT).size(20).color(FluentColors::NODE_GREEN), text("Node.js").size(14).color(FluentColors::TEXT_PRIMARY)].spacing(8),
+            row![
+                Text::new(Bootstrap::Cpu.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(20)
+                    .color(FluentColors::NODE_GREEN),
+                text("Node.js").size(14).color(FluentColors::TEXT_PRIMARY)
+            ]
+            .spacing(8),
             Space::with_height(12),
-            text(format!("{} 个版本", node_count)).size(28).color(FluentColors::TEXT_PRIMARY),
-            text(format!("{} 个项目", project_count)).size(12).color(FluentColors::TEXT_SECONDARY),
+            text(format!("{} 个版本", node_count))
+                .size(28)
+                .color(FluentColors::TEXT_PRIMARY),
+            text(format!("{} 个项目", project_count))
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(16),
             button(text("管理 →").size(12))
                 .padding([6, 12])
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(Color::TRANSPARENT.into()),
-                        border: Border { color: FluentColors::NODE_GREEN, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::NODE_GREEN,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: FluentColors::TEXT_PRIMARY,
                         ..Default::default()
                     }
                 })
                 .on_press(Message::TabSelected(Tab::Node))
-        ].spacing(8).into();
+        ]
+        .spacing(8)
+        .into();
 
         self.card(card_content, 200.0, 140.0)
     }
 
     fn java_summary_card(&self) -> Element<Message> {
         let java_count = self.java_versions.len();
-        let project_count = self.path_mappings.iter().filter(|m| !m.java_version.is_empty()).count();
+        let project_count = self
+            .path_mappings
+            .iter()
+            .filter(|m| !m.java_version.is_empty())
+            .count();
 
         let card_content: Element<Message> = column![
-            row![Text::new(Bootstrap::Cup.to_string()).font(BOOTSTRAP_FONT).size(20).color(FluentColors::JAVA_RED), text("Java").size(14).color(FluentColors::TEXT_PRIMARY)].spacing(8),
+            row![
+                Text::new(Bootstrap::Cup.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(20)
+                    .color(FluentColors::JAVA_RED),
+                text("Java").size(14).color(FluentColors::TEXT_PRIMARY)
+            ]
+            .spacing(8),
             Space::with_height(12),
-            text(format!("{} 个版本", java_count)).size(28).color(FluentColors::TEXT_PRIMARY),
-            text(format!("{} 个项目", project_count)).size(12).color(FluentColors::TEXT_SECONDARY),
+            text(format!("{} 个版本", java_count))
+                .size(28)
+                .color(FluentColors::TEXT_PRIMARY),
+            text(format!("{} 个项目", project_count))
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(16),
             button(text("管理 →").size(12))
                 .padding([6, 12])
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(Color::TRANSPARENT.into()),
-                        border: Border { color: FluentColors::JAVA_RED, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::JAVA_RED,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: FluentColors::TEXT_PRIMARY,
                         ..Default::default()
                     }
                 })
                 .on_press(Message::TabSelected(Tab::Java))
-        ].spacing(8).into();
+        ]
+        .spacing(8)
+        .into();
 
         self.card(card_content, 200.0, 140.0)
     }
 
     fn current_env_card(&self) -> Element<Message> {
         let node_label = if let Some(ref node) = self.current_status.node_version {
-            let icon = Text::new(Bootstrap::Cpu.to_string()).font(BOOTSTRAP_FONT).size(14).color(FluentColors::NODE_GREEN);
-            row![icon, text(format!("Node: v{}", node)).color(FluentColors::NODE_GREEN).size(14)].spacing(4)
+            let icon = Text::new(Bootstrap::Cpu.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(14)
+                .color(FluentColors::NODE_GREEN);
+            row![
+                icon,
+                text(format!("Node: v{}", node))
+                    .color(FluentColors::NODE_GREEN)
+                    .size(14)
+            ]
+            .spacing(4)
         } else {
-            let icon = Text::new(Bootstrap::Cpu.to_string()).font(BOOTSTRAP_FONT).size(14).color(FluentColors::TEXT_MUTED);
-            row![icon, text("Node: 未配置").color(FluentColors::TEXT_MUTED).size(14)].spacing(4)
+            let icon = Text::new(Bootstrap::Cpu.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(14)
+                .color(FluentColors::TEXT_MUTED);
+            row![
+                icon,
+                text("Node: 未配置")
+                    .color(FluentColors::TEXT_MUTED)
+                    .size(14)
+            ]
+            .spacing(4)
         };
 
         let java_label = if let Some(ref java) = self.current_status.java_version {
-            let icon = Text::new(Bootstrap::Cup.to_string()).font(BOOTSTRAP_FONT).size(14).color(FluentColors::JAVA_RED);
-            row![icon, text(format!("Java: v{}", java)).color(FluentColors::JAVA_RED).size(14)].spacing(4)
+            let icon = Text::new(Bootstrap::Cup.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(14)
+                .color(FluentColors::JAVA_RED);
+            row![
+                icon,
+                text(format!("Java: v{}", java))
+                    .color(FluentColors::JAVA_RED)
+                    .size(14)
+            ]
+            .spacing(4)
         } else {
-            let icon = Text::new(Bootstrap::Cup.to_string()).font(BOOTSTRAP_FONT).size(14).color(FluentColors::TEXT_MUTED);
-            row![icon, text("Java: 未配置").color(FluentColors::TEXT_MUTED).size(14)].spacing(4)
+            let icon = Text::new(Bootstrap::Cup.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(14)
+                .color(FluentColors::TEXT_MUTED);
+            row![
+                icon,
+                text("Java: 未配置")
+                    .color(FluentColors::TEXT_MUTED)
+                    .size(14)
+            ]
+            .spacing(4)
         };
 
         let status_indicator = if self.current_status.matched_path.is_some() {
@@ -737,23 +961,36 @@ impl EnvSwitcherApp {
 
         let card_content: Element<Message> = column![
             row![
-                Text::new(Bootstrap::Folder.to_string()).font(BOOTSTRAP_FONT).size(18).color(FluentColors::TEXT_PRIMARY),
+                Text::new(Bootstrap::Folder.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(18)
+                    .color(FluentColors::TEXT_PRIMARY),
                 text("当前路径").size(14).color(FluentColors::TEXT_PRIMARY),
                 Space::with_width(8),
-                text(&self.current_path).color(FluentColors::TEXT_SECONDARY).size(12),
+                text(&self.current_path)
+                    .color(FluentColors::TEXT_SECONDARY)
+                    .size(12),
                 horizontal_space(),
                 status_indicator
-            ].align_y(Alignment::Center),
+            ]
+            .align_y(Alignment::Center),
             Space::with_height(10),
             row![node_label, Space::with_width(30), java_label].spacing(30)
-        ].spacing(8).into();
+        ]
+        .spacing(8)
+        .into();
 
         container(card_content)
             .padding(16)
             .width(Fill)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 12.0.into(), ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    radius: 12.0.into(),
+                    ..Default::default()
+                },
                 ..Default::default()
             })
             .into()
@@ -762,176 +999,348 @@ impl EnvSwitcherApp {
     fn node_view(&self) -> Element<Message> {
         let add_btn = button(text("+ 添加版本").size(12))
             .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
+            .style(|_theme: &Theme, _status: button::Status| button::Style {
+                background: Some(Color::TRANSPARENT.into()),
+                border: Border {
+                    color: FluentColors::SUCCESS,
+                    width: 1.0,
+                    radius: 6.0.into(),
                     ..Default::default()
-                }
+                },
+                text_color: FluentColors::TEXT_PRIMARY,
+                ..Default::default()
             })
             .on_press(Message::OpenAddNodeDialog);
 
         let header = row![
-            Text::new(Bootstrap::Cpu.to_string()).font(BOOTSTRAP_FONT).size(20).color(FluentColors::NODE_GREEN),
-            text("Node.js 版本").size(16).color(FluentColors::TEXT_PRIMARY),
+            Text::new(Bootstrap::Cpu.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(20)
+                .color(FluentColors::NODE_GREEN),
+            text("Node.js 版本")
+                .size(16)
+                .color(FluentColors::TEXT_PRIMARY),
             horizontal_space(),
             add_btn
-        ].align_y(Alignment::Center).spacing(16);
+        ]
+        .align_y(Alignment::Center)
+        .spacing(16);
 
         let mut versions: Vec<Element<Message>> = Vec::new();
         for entry in &self.node_versions {
             let version_card: Element<Message> = row![
                 column![
-                    text(format!("v{}", entry.version)).size(15).color(FluentColors::NODE_GREEN),
-                    text(&entry.path).size(11).color(FluentColors::TEXT_SECONDARY)
-                ].spacing(4),
+                    text(format!("v{}", entry.version))
+                        .size(15)
+                        .color(FluentColors::NODE_GREEN),
+                    text(&entry.path)
+                        .size(11)
+                        .color(FluentColors::TEXT_SECONDARY)
+                ]
+                .spacing(4),
                 horizontal_space(),
-                button(Text::new(Bootstrap::Trash.to_string()).font(BOOTSTRAP_FONT).size(14))
-                    .padding([6, 10])
-                    .style(|_theme: &Theme, status: button::Status| {
-                        let bg = if matches!(status, button::Status::Hovered) { FluentColors::ERROR } else { Color::TRANSPARENT };
-                        button::Style {
-                            background: Some(bg.into()),
-                            border: Border { color: FluentColors::ERROR, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                            text_color: if matches!(status, button::Status::Hovered) { Color::WHITE } else { FluentColors::ERROR },
+                button(
+                    Text::new(Bootstrap::Trash.to_string())
+                        .font(BOOTSTRAP_FONT)
+                        .size(14)
+                )
+                .padding([6, 10])
+                .style(|_theme: &Theme, status: button::Status| {
+                    let bg = if matches!(status, button::Status::Hovered) {
+                        FluentColors::ERROR
+                    } else {
+                        Color::TRANSPARENT
+                    };
+                    button::Style {
+                        background: Some(bg.into()),
+                        border: Border {
+                            color: FluentColors::ERROR,
+                            width: 1.0,
+                            radius: 6.0.into(),
                             ..Default::default()
-                        }
-                    })
-                    .on_press(Message::RemoveNodeVersion(entry.version.clone()))
-            ].align_y(Alignment::Center).spacing(16).into();
+                        },
+                        text_color: if matches!(status, button::Status::Hovered) {
+                            Color::WHITE
+                        } else {
+                            FluentColors::ERROR
+                        },
+                        ..Default::default()
+                    }
+                })
+                .on_press(Message::RemoveNodeVersion(entry.version.clone()))
+            ]
+            .align_y(Alignment::Center)
+            .spacing(16)
+            .into();
 
             versions.push(self.card_row(version_card).into());
             versions.push(Space::with_height(8).into());
         }
 
-        scrollable(column![header, Space::with_height(12), Column::with_children(versions)].spacing(0)).into()
+        scrollable(
+            column![
+                header,
+                Space::with_height(12),
+                Column::with_children(versions)
+            ]
+            .spacing(0),
+        )
+        .into()
     }
 
     fn java_view(&self) -> Element<Message> {
         let add_btn = button(text("+ 添加版本").size(12))
             .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
+            .style(|_theme: &Theme, _status: button::Status| button::Style {
+                background: Some(Color::TRANSPARENT.into()),
+                border: Border {
+                    color: FluentColors::SUCCESS,
+                    width: 1.0,
+                    radius: 6.0.into(),
                     ..Default::default()
-                }
+                },
+                text_color: FluentColors::TEXT_PRIMARY,
+                ..Default::default()
             })
             .on_press(Message::OpenAddJavaDialog);
 
         let header = row![
-            Text::new(Bootstrap::Cup.to_string()).font(BOOTSTRAP_FONT).size(20).color(FluentColors::JAVA_RED),
+            Text::new(Bootstrap::Cup.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(20)
+                .color(FluentColors::JAVA_RED),
             text("Java 版本").size(16).color(FluentColors::TEXT_PRIMARY),
             horizontal_space(),
             add_btn
-        ].align_y(Alignment::Center).spacing(16);
+        ]
+        .align_y(Alignment::Center)
+        .spacing(16);
 
         let mut versions: Vec<Element<Message>> = Vec::new();
         for entry in &self.java_versions {
             let version_card: Element<Message> = row![
                 column![
-                    text(format!("v{}", entry.version)).size(15).color(FluentColors::JAVA_RED),
-                    text(&entry.path).size(11).color(FluentColors::TEXT_SECONDARY)
-                ].spacing(4),
+                    text(format!("v{}", entry.version))
+                        .size(15)
+                        .color(FluentColors::JAVA_RED),
+                    text(&entry.path)
+                        .size(11)
+                        .color(FluentColors::TEXT_SECONDARY)
+                ]
+                .spacing(4),
                 horizontal_space(),
-                button(Text::new(Bootstrap::Trash.to_string()).font(BOOTSTRAP_FONT).size(14))
-                    .padding([6, 10])
-                    .style(|_theme: &Theme, status: button::Status| {
-                        let bg = if matches!(status, button::Status::Hovered) { FluentColors::ERROR } else { Color::TRANSPARENT };
-                        button::Style {
-                            background: Some(bg.into()),
-                            border: Border { color: FluentColors::ERROR, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                            text_color: if matches!(status, button::Status::Hovered) { Color::WHITE } else { FluentColors::ERROR },
+                button(
+                    Text::new(Bootstrap::Trash.to_string())
+                        .font(BOOTSTRAP_FONT)
+                        .size(14)
+                )
+                .padding([6, 10])
+                .style(|_theme: &Theme, status: button::Status| {
+                    let bg = if matches!(status, button::Status::Hovered) {
+                        FluentColors::ERROR
+                    } else {
+                        Color::TRANSPARENT
+                    };
+                    button::Style {
+                        background: Some(bg.into()),
+                        border: Border {
+                            color: FluentColors::ERROR,
+                            width: 1.0,
+                            radius: 6.0.into(),
                             ..Default::default()
-                        }
-                    })
-                    .on_press(Message::RemoveJavaVersion(entry.version.clone()))
-            ].align_y(Alignment::Center).spacing(16).into();
+                        },
+                        text_color: if matches!(status, button::Status::Hovered) {
+                            Color::WHITE
+                        } else {
+                            FluentColors::ERROR
+                        },
+                        ..Default::default()
+                    }
+                })
+                .on_press(Message::RemoveJavaVersion(entry.version.clone()))
+            ]
+            .align_y(Alignment::Center)
+            .spacing(16)
+            .into();
 
             versions.push(self.card_row(version_card).into());
             versions.push(Space::with_height(8).into());
         }
 
-        scrollable(column![header, Space::with_height(12), Column::with_children(versions)].spacing(0)).into()
+        scrollable(
+            column![
+                header,
+                Space::with_height(12),
+                Column::with_children(versions)
+            ]
+            .spacing(0),
+        )
+        .into()
     }
 
     fn paths_view(&self) -> Element<Message> {
         let add_btn = button(text("+ 添加映射").size(12))
             .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
+            .style(|_theme: &Theme, _status: button::Status| button::Style {
+                background: Some(Color::TRANSPARENT.into()),
+                border: Border {
+                    color: FluentColors::SUCCESS,
+                    width: 1.0,
+                    radius: 6.0.into(),
                     ..Default::default()
-                }
+                },
+                text_color: FluentColors::TEXT_PRIMARY,
+                ..Default::default()
             })
             .on_press(Message::OpenAddMappingDialog);
 
         let header = row![
-            Text::new(Bootstrap::Folder.to_string()).font(BOOTSTRAP_FONT).size(20).color(FluentColors::TEXT_PRIMARY),
+            Text::new(Bootstrap::Folder.to_string())
+                .font(BOOTSTRAP_FONT)
+                .size(20)
+                .color(FluentColors::TEXT_PRIMARY),
             text("路径映射").size(16).color(FluentColors::TEXT_PRIMARY),
             horizontal_space(),
             add_btn
-        ].align_y(Alignment::Center).spacing(16);
+        ]
+        .align_y(Alignment::Center)
+        .spacing(16);
 
         let mut mappings: Vec<Element<Message>> = Vec::new();
         for entry in &self.path_mappings {
             let node_label = if !entry.node_version.is_empty() {
-                let icon = Text::new(Bootstrap::Cpu.to_string()).font(BOOTSTRAP_FONT).size(12).color(FluentColors::NODE_GREEN);
-                row![icon, text(entry.node_version.clone()).color(FluentColors::NODE_GREEN).size(12)].spacing(4)
+                let icon = Text::new(Bootstrap::Cpu.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(12)
+                    .color(FluentColors::NODE_GREEN);
+                row![
+                    icon,
+                    text(entry.node_version.clone())
+                        .color(FluentColors::NODE_GREEN)
+                        .size(12)
+                ]
+                .spacing(4)
             } else {
-                let icon = Text::new(Bootstrap::Cpu.to_string()).font(BOOTSTRAP_FONT).size(12).color(FluentColors::TEXT_MUTED);
-                row![icon, text("未配置").color(FluentColors::TEXT_MUTED).size(12)].spacing(4)
+                let icon = Text::new(Bootstrap::Cpu.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(12)
+                    .color(FluentColors::TEXT_MUTED);
+                row![
+                    icon,
+                    text("未配置").color(FluentColors::TEXT_MUTED).size(12)
+                ]
+                .spacing(4)
             };
 
             let java_label = if !entry.java_version.is_empty() {
-                let icon = Text::new(Bootstrap::Cup.to_string()).font(BOOTSTRAP_FONT).size(12).color(FluentColors::JAVA_RED);
-                row![icon, text(entry.java_version.clone()).color(FluentColors::JAVA_RED).size(12)].spacing(4)
+                let icon = Text::new(Bootstrap::Cup.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(12)
+                    .color(FluentColors::JAVA_RED);
+                row![
+                    icon,
+                    text(entry.java_version.clone())
+                        .color(FluentColors::JAVA_RED)
+                        .size(12)
+                ]
+                .spacing(4)
             } else {
-                let icon = Text::new(Bootstrap::Cup.to_string()).font(BOOTSTRAP_FONT).size(12).color(FluentColors::TEXT_MUTED);
-                row![icon, text("未配置").color(FluentColors::TEXT_MUTED).size(12)].spacing(4)
+                let icon = Text::new(Bootstrap::Cup.to_string())
+                    .font(BOOTSTRAP_FONT)
+                    .size(12)
+                    .color(FluentColors::TEXT_MUTED);
+                row![
+                    icon,
+                    text("未配置").color(FluentColors::TEXT_MUTED).size(12)
+                ]
+                .spacing(4)
             };
 
             let mapping_card: Element<Message> = row![
                 column![
-                    row![Text::new(Bootstrap::Folder.to_string()).font(BOOTSTRAP_FONT).size(13).color(FluentColors::TEXT_PRIMARY), text(&entry.path).size(13).color(FluentColors::TEXT_PRIMARY)].spacing(4),
-                    text(&entry.path).size(11).color(FluentColors::TEXT_SECONDARY),
+                    row![
+                        Text::new(Bootstrap::Folder.to_string())
+                            .font(BOOTSTRAP_FONT)
+                            .size(13)
+                            .color(FluentColors::TEXT_PRIMARY),
+                        text(&entry.path).size(13).color(FluentColors::TEXT_PRIMARY)
+                    ]
+                    .spacing(4),
+                    text(&entry.path)
+                        .size(11)
+                        .color(FluentColors::TEXT_SECONDARY),
                     Space::with_height(6),
                     row![node_label, Space::with_width(15), java_label].spacing(15)
-                ].spacing(4),
+                ]
+                .spacing(4),
                 horizontal_space(),
-                button(Text::new(Bootstrap::Trash.to_string()).font(BOOTSTRAP_FONT).size(14))
-                    .padding([6, 10])
-                    .style(|_theme: &Theme, status: button::Status| {
-                        let bg = if matches!(status, button::Status::Hovered) { FluentColors::ERROR } else { Color::TRANSPARENT };
-                        button::Style {
-                            background: Some(bg.into()),
-                            border: Border { color: FluentColors::ERROR, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                            text_color: if matches!(status, button::Status::Hovered) { Color::WHITE } else { FluentColors::ERROR },
+                button(
+                    Text::new(Bootstrap::Trash.to_string())
+                        .font(BOOTSTRAP_FONT)
+                        .size(14)
+                )
+                .padding([6, 10])
+                .style(|_theme: &Theme, status: button::Status| {
+                    let bg = if matches!(status, button::Status::Hovered) {
+                        FluentColors::ERROR
+                    } else {
+                        Color::TRANSPARENT
+                    };
+                    button::Style {
+                        background: Some(bg.into()),
+                        border: Border {
+                            color: FluentColors::ERROR,
+                            width: 1.0,
+                            radius: 6.0.into(),
                             ..Default::default()
-                        }
-                    })
-                    .on_press(Message::RemovePathMapping(entry.path.clone()))
-            ].align_y(Alignment::Center).spacing(16).into();
+                        },
+                        text_color: if matches!(status, button::Status::Hovered) {
+                            Color::WHITE
+                        } else {
+                            FluentColors::ERROR
+                        },
+                        ..Default::default()
+                    }
+                })
+                .on_press(Message::RemovePathMapping(entry.path.clone()))
+            ]
+            .align_y(Alignment::Center)
+            .spacing(16)
+            .into();
 
             mappings.push(self.card_row(mapping_card).into());
             mappings.push(Space::with_height(8).into());
         }
 
-        scrollable(column![header, Space::with_height(12), Column::with_children(mappings)].spacing(0)).into()
+        scrollable(
+            column![
+                header,
+                Space::with_height(12),
+                Column::with_children(mappings)
+            ]
+            .spacing(0),
+        )
+        .into()
     }
 
-    fn card<'a>(&self, content: Element<'a, Message>, width: f32, height: f32) -> Element<'a, Message> {
+    fn card<'a>(
+        &self,
+        content: Element<'a, Message>,
+        width: f32,
+        height: f32,
+    ) -> Element<'a, Message> {
         container(content)
             .padding(16)
             .width(width)
             .height(height)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 12.0.into(), ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    radius: 12.0.into(),
+                    ..Default::default()
+                },
                 ..Default::default()
             })
             .into()
@@ -943,7 +1352,12 @@ impl EnvSwitcherApp {
             .width(Fill)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 12.0.into(), ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    radius: 12.0.into(),
+                    ..Default::default()
+                },
                 ..Default::default()
             })
             .into()
@@ -951,18 +1365,23 @@ impl EnvSwitcherApp {
 
     fn add_node_dialog(&self) -> Element<Message> {
         let version_input = text_input("版本号，如 18.0.0", &self.new_node_version)
-            .padding(8).on_input(Message::NodeVersionInputChanged);
+            .padding(8)
+            .on_input(Message::NodeVersionInputChanged);
         let path_input = text_input("安装路径", &self.new_node_path)
-            .padding(8).on_input(Message::NodePathInputChanged);
+            .padding(8)
+            .on_input(Message::NodePathInputChanged);
         let browse_btn = button(text("浏览...").size(12))
             .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::INFO, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
+            .style(|_theme: &Theme, _status: button::Status| button::Style {
+                background: Some(Color::TRANSPARENT.into()),
+                border: Border {
+                    color: FluentColors::INFO,
+                    width: 1.0,
+                    radius: 6.0.into(),
                     ..Default::default()
-                }
+                },
+                text_color: FluentColors::TEXT_PRIMARY,
+                ..Default::default()
             })
             .on_press(Message::BrowseNodePath);
         let path_row = row![path_input, browse_btn].spacing(8);
@@ -972,7 +1391,12 @@ impl EnvSwitcherApp {
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(FluentColors::BG_BUTTON_PRIMARY.into()),
-                        border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::SUCCESS,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: Color::WHITE,
                         ..Default::default()
                     }
@@ -983,42 +1407,59 @@ impl EnvSwitcherApp {
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(Color::TRANSPARENT.into()),
-                        border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::BORDER_DEFAULT,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: FluentColors::TEXT_PRIMARY,
                         ..Default::default()
                     }
                 })
                 .on_press(Message::CloseAddNodeDialog)
-        ].spacing(16);
+        ]
+        .spacing(16);
         column![
-            text("添加 Node.js 版本").size(16).color(FluentColors::TEXT_PRIMARY),
+            text("添加 Node.js 版本")
+                .size(16)
+                .color(FluentColors::TEXT_PRIMARY),
             Space::with_height(16),
             text("版本号:").size(12).color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             version_input,
             Space::with_height(12),
-            text("安装路径:").size(12).color(FluentColors::TEXT_SECONDARY),
+            text("安装路径:")
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             path_row,
             Space::with_height(20),
             button_row
-        ].spacing(8).into()
+        ]
+        .spacing(8)
+        .into()
     }
 
     fn add_java_dialog(&self) -> Element<Message> {
         let version_input = text_input("版本号，如 17", &self.new_java_version)
-            .padding(8).on_input(Message::JavaVersionInputChanged);
+            .padding(8)
+            .on_input(Message::JavaVersionInputChanged);
         let path_input = text_input("安装路径", &self.new_java_path)
-            .padding(8).on_input(Message::JavaPathInputChanged);
+            .padding(8)
+            .on_input(Message::JavaPathInputChanged);
         let browse_btn = button(text("浏览...").size(12))
             .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::INFO, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
+            .style(|_theme: &Theme, _status: button::Status| button::Style {
+                background: Some(Color::TRANSPARENT.into()),
+                border: Border {
+                    color: FluentColors::INFO,
+                    width: 1.0,
+                    radius: 6.0.into(),
                     ..Default::default()
-                }
+                },
+                text_color: FluentColors::TEXT_PRIMARY,
+                ..Default::default()
             })
             .on_press(Message::BrowseJavaPath);
         let path_row = row![path_input, browse_btn].spacing(8);
@@ -1028,7 +1469,12 @@ impl EnvSwitcherApp {
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(FluentColors::BG_BUTTON_PRIMARY.into()),
-                        border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::SUCCESS,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: Color::WHITE,
                         ..Default::default()
                     }
@@ -1039,49 +1485,67 @@ impl EnvSwitcherApp {
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(Color::TRANSPARENT.into()),
-                        border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::BORDER_DEFAULT,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: FluentColors::TEXT_PRIMARY,
                         ..Default::default()
                     }
                 })
                 .on_press(Message::CloseAddJavaDialog)
-        ].spacing(16);
+        ]
+        .spacing(16);
         column![
-            text("添加 Java 版本").size(16).color(FluentColors::TEXT_PRIMARY),
+            text("添加 Java 版本")
+                .size(16)
+                .color(FluentColors::TEXT_PRIMARY),
             Space::with_height(16),
             text("版本号:").size(12).color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             version_input,
             Space::with_height(12),
-            text("安装路径:").size(12).color(FluentColors::TEXT_SECONDARY),
+            text("安装路径:")
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             path_row,
             Space::with_height(20),
             button_row
-        ].spacing(8).into()
+        ]
+        .spacing(8)
+        .into()
     }
 
     fn add_mapping_dialog(&self) -> Element<Message> {
         let path_input = text_input("项目路径", &self.new_mapping_path)
-            .padding(8).on_input(Message::MappingPathInputChanged);
+            .padding(8)
+            .on_input(Message::MappingPathInputChanged);
         let browse_btn = button(text("浏览...").size(12))
             .padding([6, 12])
-            .style(|_theme: &Theme, _status: button::Status| {
-                button::Style {
-                    background: Some(Color::TRANSPARENT.into()),
-                    border: Border { color: FluentColors::INFO, width: 1.0, radius: 6.0.into(), ..Default::default() },
-                    text_color: FluentColors::TEXT_PRIMARY,
+            .style(|_theme: &Theme, _status: button::Status| button::Style {
+                background: Some(Color::TRANSPARENT.into()),
+                border: Border {
+                    color: FluentColors::INFO,
+                    width: 1.0,
+                    radius: 6.0.into(),
                     ..Default::default()
-                }
+                },
+                text_color: FluentColors::TEXT_PRIMARY,
+                ..Default::default()
             })
             .on_press(Message::BrowseMappingPath);
         let path_row = row![path_input, browse_btn].spacing(8);
 
         // Use text inputs instead of picklists to avoid lifetime issues
         let node_input = text_input("Node.js 版本号（可选）", &self.selected_node_for_mapping)
-            .padding(8).on_input(Message::NodeVersionInputForMappingChanged);
+            .padding(8)
+            .on_input(Message::NodeVersionInputForMappingChanged);
         let java_input = text_input("Java 版本号（可选）", &self.selected_java_for_mapping)
-            .padding(8).on_input(Message::JavaVersionInputForMappingChanged);
+            .padding(8)
+            .on_input(Message::JavaVersionInputForMappingChanged);
 
         let button_row = row![
             button(text("确定").size(12))
@@ -1089,7 +1553,12 @@ impl EnvSwitcherApp {
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(FluentColors::BG_BUTTON_PRIMARY.into()),
-                        border: Border { color: FluentColors::SUCCESS, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::SUCCESS,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: Color::WHITE,
                         ..Default::default()
                     }
@@ -1100,30 +1569,46 @@ impl EnvSwitcherApp {
                 .style(|_theme: &Theme, _status: button::Status| {
                     button::Style {
                         background: Some(Color::TRANSPARENT.into()),
-                        border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 6.0.into(), ..Default::default() },
+                        border: Border {
+                            color: FluentColors::BORDER_DEFAULT,
+                            width: 1.0,
+                            radius: 6.0.into(),
+                            ..Default::default()
+                        },
                         text_color: FluentColors::TEXT_PRIMARY,
                         ..Default::default()
                     }
                 })
                 .on_press(Message::CloseAddMappingDialog)
-        ].spacing(16);
+        ]
+        .spacing(16);
         column![
-            text("添加路径映射").size(16).color(FluentColors::TEXT_PRIMARY),
+            text("添加路径映射")
+                .size(16)
+                .color(FluentColors::TEXT_PRIMARY),
             Space::with_height(16),
-            text("项目路径:").size(12).color(FluentColors::TEXT_SECONDARY),
+            text("项目路径:")
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             path_row,
             Space::with_height(12),
-            text("Node.js 版本:").size(12).color(FluentColors::TEXT_SECONDARY),
+            text("Node.js 版本:")
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             node_input,
             Space::with_height(12),
-            text("Java 版本:").size(12).color(FluentColors::TEXT_SECONDARY),
+            text("Java 版本:")
+                .size(12)
+                .color(FluentColors::TEXT_SECONDARY),
             Space::with_height(4),
             java_input,
             Space::with_height(20),
             button_row
-        ].spacing(8).into()
+        ]
+        .spacing(8)
+        .into()
     }
 }
 
@@ -1141,13 +1626,21 @@ fn view(state: &EnvSwitcherApp) -> Element<Message> {
             .height(320.0)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 12.0.into(), ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    radius: 12.0.into(),
+                    ..Default::default()
+                },
                 ..Default::default()
             });
         return container(column![
             container(main_view).width(Fill).height(Fill),
             container(overlay).center_x(Fill).center_y(Fill)
-        ]).width(Fill).height(Fill).into();
+        ])
+        .width(Fill)
+        .height(Fill)
+        .into();
     }
 
     if state.show_add_java_dialog {
@@ -1157,13 +1650,21 @@ fn view(state: &EnvSwitcherApp) -> Element<Message> {
             .height(320.0)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 12.0.into(), ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    radius: 12.0.into(),
+                    ..Default::default()
+                },
                 ..Default::default()
             });
         return container(column![
             container(main_view).width(Fill).height(Fill),
             container(overlay).center_x(Fill).center_y(Fill)
-        ]).width(Fill).height(Fill).into();
+        ])
+        .width(Fill)
+        .height(Fill)
+        .into();
     }
 
     if state.show_add_mapping_dialog {
@@ -1173,13 +1674,21 @@ fn view(state: &EnvSwitcherApp) -> Element<Message> {
             .height(380.0)
             .style(|_| container::Style {
                 background: Some(FluentColors::BG_CARD.into()),
-                border: Border { color: FluentColors::BORDER_DEFAULT, width: 1.0, radius: 12.0.into(), ..Default::default() },
+                border: Border {
+                    color: FluentColors::BORDER_DEFAULT,
+                    width: 1.0,
+                    radius: 12.0.into(),
+                    ..Default::default()
+                },
                 ..Default::default()
             });
         return container(column![
             container(main_view).width(Fill).height(Fill),
             container(overlay).center_x(Fill).center_y(Fill)
-        ]).width(Fill).height(Fill).into();
+        ])
+        .width(Fill)
+        .height(Fill)
+        .into();
     }
 
     main_view
